@@ -1,0 +1,24 @@
+sources:
+    directory:
+        address: 'localhost'
+        port: '2636'
+        useSSL: true
+        trustSSLCert: true
+        followReferrals: true
+        bindDN: ''
+        bindPassword: ''
+
+dit:
+    'ou=people,dc=someu,dc=edu':
+        singular: 'person'
+        plural: 'people'
+        rdnAttribute: 'uid'
+        source: 'directory'
+        attributes:
+          - '*'
+          - '+'
+    'ou=groups,dc=someu,dc=edu':
+        singular: 'group'
+        plural: 'groups'
+        rdnAttribute: 'cn'
+        source: 'directory'
