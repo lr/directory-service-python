@@ -9,7 +9,8 @@ Us the provided example `conf/Config.yaml.template` file to map out your LDAP di
 For now, see the test cases for how to do these things. More details coming soon.
 
 ## Testing
-In order to test this module, you will need a real LDAP server with live data (no mocks here). See the (directory-data)[https://github.com/lr/directory-data] project for details on setting up (OpenDJ)[https://github.com/OpenIdentityPlatform/OpenDJ] with data.
+In order to test this module, you will need a real LDAP server with live data (no mocks here). See the [directory-data](https://github.com/lr/directory-data) project for details on setting up [OpenDJ](https://github.com/OpenIdentityPlatform/OpenDJ) with data.
 
 If you have all of that set up, then you can run the tests with:
+
     python -m unittest
