@@ -18,8 +18,9 @@ class TestDirectoryService(unittest.TestCase):
 
     def test_findPerson(self):
         person = self.ds.find('person', '(uid=3)')
-        assert person.givenName   == 'Mabel'
-        assert person.description == 'This is the description for Rockland, Mabel.'
+        assert person.givenName    == 'Mabel'
+        assert person.description  == 'This is the description for Rockland, Mabel.'
+        assert person.doesNotExist == None
         assert len(person.objectClassValues) == 5
 
     def test_findPeople(self):
@@ -70,19 +71,22 @@ description: This is the Service Desk group
 """
 
     def test_modEntry(self):
-        person = self.ds.find('person', '(uid=10)')
+        person = self.ds.find('person', '(uid=100)')
         
-        person.givenName = 'Hi'
-        person.sn        = 'There'
+        person.givenName = 'First'
+        person.sn        = 'Last'
+        person.cn        = [b'First Last', b'Last, First', b'First A Last']
         
         modded = self.ds.modify(person)
 
-        refetchedPerson = self.ds.find('person', '(uid=10)')
-        assert refetchedPerson.givenName == 'Hi'
-        assert refetchedPerson.sn        == 'There'
+        refetchedPerson = self.ds.find('person', '(uid=100)')
+        assert refetchedPerson.givenName == 'First'
+        assert refetchedPerson.sn        == 'Last'
+        assert len(refetchedPerson.cnValues) == 3
         
         refetchedPerson.givenName = 'Jill'
-        refetchedPerson.sn        = 'Chu'
+        refetchedPerson.sn        = 'Peters'
+        refetchedPerson.cn        = [b'Jill Peters', b'Peters, Jill']
         modded = self.ds.modify(refetchedPerson)
 
 if __name__ == '__main__':
