@@ -1,12 +1,24 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = [ "poetry-core",]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "directory-service"
-version = "0.0.1"
-dependencies = [
-    'ldap',
-    'yaml',
-    'python_version<"3.8"',
+packages = [
+    { include="directory_service", from="." },
 ]
+version = "0.1.0"
+license = "BSD 3-Clause License"
+description = "Convenince wrapper for LDAP."
+authors = ["Lucas Rockwell <lr@lucasrockwell.com>"]
+readme = "README.md"
+exclude = ["htmlcov/*"]
+
+[tool.isort]
+profile = "black"
+add_imports = "from __future__ import annotations"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+python-ldap = "^3.4.3"
+PyYAML = "^6.0"
