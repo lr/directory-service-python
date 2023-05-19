@@ -1,10 +1,12 @@
 import ldap
 import yaml
 
+from directory_service.logger import log
+
 class DirectoryService:
 
-    conn = None
     conf = None
+    conn = dict()
 
     plainProto = 'ldap://'
     sslProto   = 'ldaps://'
@@ -23,17 +25,18 @@ class DirectoryService:
         """Gets the LDAP connection object given the provided sourceString name
            that is then used to look up the info from the config."""
 
-        if (self.conn == None):
+        if sourceString not in self.conn.keys():
             source = self.conf['sources'][sourceString]
             ptoto  = self.plainProto
             if (source['useSSL']):
                 proto = self.sslProto
 
             conn_string = proto + source['address'] + ':' + source['port']
-            self.conn   = ldap.initialize(conn_string)
-            self.conn.simple_bind_s(source['bindDN'], source['bindPassword'])
+            self.conn[sourceString] = ldap.initialize(conn_string)
+            self.conn[sourceString].simple_bind_s(
+                source['bindDN'], source['bindPassword'])
         
-        return self.conn
+        return self.conn[sourceString]
 
     def find(self, ditItem, searchFilter):
         """Finds LDAP objects given the provided ditItem and searchFilter. If
@@ -73,10 +76,17 @@ class DirectoryService:
             values['source']).delete_s(dn)
 
     def modify(self, entry):
+        """Gets the connection from which the provided entry originated, then
+           calls modify_s on that connection with any modifications that have
+           been set in the entry."""
         values = self.valuesFromDitItem(entry.ditItem)
         
-        return self.connection(
-            values['source']).modify_s(entry.dn, entry.modifications)
+        if values and entry.modifications:
+            return self.connection(
+                values['source']).modify_s(entry.dn, entry.modifications)
+        else:
+            log.warning("No modifications where present; no calling modify.")
+            return None
 
     def valuesFromDitItem(self, ditItem):
         """Returns a dictionary of values that correspond to the supplied
@@ -141,8 +151,8 @@ class DirectoryServiceEntry:
             return getattr(self, 'modifications')
         else:
             attrName = attr.replace('Values', '')
-            if (self.entry[attrName] != None):
-                if (attr.endswith('Values')):
+            if attrName in self.entry.keys():
+                if attr.endswith('Values'):
                     return self.entry[attrName]
                 else:
                     return self.entry[attrName][0].decode('UTF-8')
